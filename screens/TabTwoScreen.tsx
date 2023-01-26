@@ -1,15 +1,59 @@
-import { StyleSheet } from 'react-native';
-
-import EditScreenInfo from '../components/EditScreenInfo';
-import { Text, View } from '../components/Themed';
+import { useEffect, useState } from 'react';
+import { FlatList, SafeAreaView, StyleSheet, Text } from 'react-native';
+import ItemCard from '../components/cards/item-card';
+import { getUpcomingMovies } from '../services/movies.service';
 
 export default function TabTwoScreen() {
+  const [movies, setMovies] = useState<any>([])
+  const [mounted, setMounted] = useState<boolean>(false)
+  const [refreshing, setRefreshing] = useState<boolean>(false)
+
+  const fetchUpcomingMovies = () => {
+    console.log('trigger api upcoming')
+    getUpcomingMovies().then((item : any) => {
+      setMovies([...item.results])
+      setMounted(true)
+
+      if(refreshing){
+        setRefreshing(false)
+      }
+    }).catch((error) => {
+      console.log(error)
+    })
+  }
+
+  const refreshData = () => {
+    setRefreshing(true)
+    setMounted(false)
+    console.log("trigger refresh")
+  }
+
+  useEffect(() => {
+    if(!mounted){
+      fetchUpcomingMovies()
+    }
+  }, [mounted])
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="/screens/TabTwoScreen.tsx" />
-    </View>
+    <SafeAreaView style={styles.container}>
+      {/* <Text>
+        Hello
+      </Text> */}
+        <FlatList
+          data={movies}
+          refreshing={refreshing}
+          onRefresh={() => refreshData()}
+          renderItem={({item}) => 
+            <ItemCard 
+              title={item.original_title}
+              image={item.poster_path}
+              popularity={item.popularity}
+              voteAverage={item.vote_average}
+              releaseDate={item.release_date}></ItemCard>
+          }
+          keyExtractor={item => item.id}
+        />
+    </SafeAreaView>
   );
 }
 
@@ -18,14 +62,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+    marginTop: 10
   },
 });

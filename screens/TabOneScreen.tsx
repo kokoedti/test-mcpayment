@@ -1,23 +1,32 @@
 import { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, SafeAreaView, FlatList } from 'react-native';
+import { StyleSheet, SafeAreaView, FlatList } from 'react-native';
 import ItemCard from '../components/cards/item-card';
-
-import EditScreenInfo from '../components/EditScreenInfo';
-import { Text, View } from '../components/Themed';
 import { getTopRatedMovies } from '../services/movies.service';
 import { RootTabScreenProps } from '../types';
 
 export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'>) {
   const [movies, setMovies] = useState<any>([])
   const [mounted, setMounted] = useState<boolean>(false)
+  const [refreshing, setRefreshing] = useState<boolean>(false)
   
   const fetchLatestMovies = () => {
-    getTopRatedMovies().then((item) => {
+    console.log('trigger api latest')
+    getTopRatedMovies().then((item: any) => {
       setMovies([...item.results])
       setMounted(true)
+
+      if(refreshing){
+        setRefreshing(false)
+      }
     }).catch((error) => {
       console.log(error)
     })
+  }
+
+  const refreshData = () => {
+    setRefreshing(true)
+    setMounted(false)
+    console.log("trigger refresh")
   }
   
   useEffect(() => {
@@ -31,6 +40,8 @@ export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'
     <SafeAreaView style={styles.container}>
       <FlatList
           data={movies}
+          refreshing={refreshing}
+          onRefresh={() => refreshData()}
           renderItem={({item}) => 
             <ItemCard 
               title={item.original_title}
@@ -51,14 +62,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 10
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
   },
 });

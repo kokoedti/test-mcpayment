@@ -10,7 +10,7 @@ const getTopRatedMovies = () => {
 
 const getUpcomingMovies = () => {
     return axios.get(
-        `https://api.themoviedb.org/3/upcoming/top_rated?api_key=d4ee404499fd3d2671c162d9d7d1d545`
+        `https://api.themoviedb.org/3/movie/upcoming?api_key=d4ee404499fd3d2671c162d9d7d1d545`
         ).then((item) => {
         return item.data
     })
