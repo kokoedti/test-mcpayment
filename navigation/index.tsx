@@ -3,7 +3,7 @@
  * https://reactnavigation.org/docs/getting-started
  *
  */
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -14,7 +14,9 @@ import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 import ModalScreen from '../screens/ModalScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
+import TabFourScreen from '../screens/TabFourScreen';
 import TabOneScreen from '../screens/TabOneScreen';
+import TabThreeScreen from '../screens/TabThreeScreen';
 import TabTwoScreen from '../screens/TabTwoScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
@@ -60,27 +62,17 @@ function BottomTabNavigator() {
     <BottomTab.Navigator
       initialRouteName="TabOne"
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme].tint,
+        tabBarActiveTintColor: '#000',
+        tabBarInactiveTintColor: 'gray',
       }}>
       <BottomTab.Screen
         name="TabOne"
         component={TabOneScreen}
         options={({ navigation }: RootTabScreenProps<'TabOne'>) => ({
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Pressable
-              onPress={() => navigation.navigate('Modal')}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.5 : 1,
-              })}>
-              <FontAwesome
-                name="info-circle"
-                size={25}
-                color={Colors[colorScheme].text}
-                style={{ marginRight: 15 }}
-              />
-            </Pressable>
+          title: 'Top Rated Movies',
+          tabBarLabel: 'Rated',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="movie" color={color} size={size} />
           ),
         })}
       />
@@ -88,10 +80,35 @@ function BottomTabNavigator() {
         name="TabTwo"
         component={TabTwoScreen}
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Upcoming Movies',
+          tabBarLabel: 'Upcoming',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="movie" color={color} size={size} />
+          ),
         }}
       />
+      <BottomTab.Screen
+        name='TabThree'
+        component={TabThreeScreen}
+        options={{
+          title: 'Top Rated TV Shows',
+          tabBarLabel: 'Rated',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="television" color={color} size={size} />
+          ),
+        }}
+        />
+        <BottomTab.Screen
+          name='TabFour'
+          component={TabFourScreen}
+          options={{
+            title: 'Popular TV Shows',
+            tabBarLabel: 'Popular',
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="television" color={color} size={size} />
+            ),          
+          }}
+          />
     </BottomTab.Navigator>
   );
 }
