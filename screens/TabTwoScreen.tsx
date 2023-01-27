@@ -4,28 +4,35 @@ import ItemCard from '../components/cards/item-card';
 import { getUpcomingMovies } from '../services/movies.service';
 
 export default function TabTwoScreen() {
-  const [movies, setMovies] = useState<any>([])
+  const [movies, setMovies] = useState<any[]>([])
   const [mounted, setMounted] = useState<boolean>(false)
   const [refreshing, setRefreshing] = useState<boolean>(false)
+  const [emptyMessage, setEmptyMessage] = useState<string>('')
 
   const fetchUpcomingMovies = () => {
     console.log('trigger api upcoming')
     getUpcomingMovies().then((item : any) => {
-      setMovies([...item.results])
       setMounted(true)
 
+      if(item.results.length === 0){
+          setEmptyMessage(`Sorry It's Empty`)
+      }else{
+          setMovies([...item.results])
+      }
+      
       if(refreshing){
-        setRefreshing(false)
+          setRefreshing(false)
       }
     }).catch((error) => {
-      console.log(error)
+      console.log(error.error.message)
+      const message = error.error.message ? error.error.message : 'A Problem Occured'
+      setEmptyMessage(message)
     })
   }
 
   const refreshData = () => {
     setRefreshing(true)
     setMounted(false)
-    console.log("trigger refresh")
   }
 
   useEffect(() => {
@@ -36,13 +43,11 @@ export default function TabTwoScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* <Text>
-        Hello
-      </Text> */}
         <FlatList
           data={movies}
           refreshing={refreshing}
           onRefresh={() => refreshData()}
+          ListEmptyComponent={() => <Text>{emptyMessage}</Text>}
           renderItem={({item}) => 
             <ItemCard 
               title={item.original_title}

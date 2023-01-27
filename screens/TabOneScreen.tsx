@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, SafeAreaView, FlatList } from 'react-native';
+import { StyleSheet, SafeAreaView, FlatList, Text } from 'react-native';
 import ItemCard from '../components/cards/item-card';
 import { getTopRatedMovies } from '../services/movies.service';
 import { RootTabScreenProps } from '../types';
@@ -8,25 +8,33 @@ export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'
   const [movies, setMovies] = useState<any>([])
   const [mounted, setMounted] = useState<boolean>(false)
   const [refreshing, setRefreshing] = useState<boolean>(false)
+  const [emptyMessage, setEmptyMessage] = useState<string>('')
+
   
   const fetchLatestMovies = () => {
     console.log('trigger api latest')
     getTopRatedMovies().then((item: any) => {
-      setMovies([...item.results])
-      setMounted(true)
+        setMounted(true)
 
-      if(refreshing){
-        setRefreshing(false)
-      }
+        if(item.results.length === 0){
+            setEmptyMessage(`Sorry It's Empty`)
+        }else{
+            setMovies([...item.results])
+        }
+        
+        if(refreshing){
+            setRefreshing(false)
+        }
     }).catch((error) => {
-      console.log(error)
+        console.log(error.error.message)
+        const message = error.error.message ? error.error.message : 'A Problem Occured'
+        setEmptyMessage(message)
     })
   }
 
   const refreshData = () => {
     setRefreshing(true)
     setMounted(false)
-    console.log("trigger refresh")
   }
   
   useEffect(() => {
@@ -42,6 +50,7 @@ export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'
           data={movies}
           refreshing={refreshing}
           onRefresh={() => refreshData()}
+          ListEmptyComponent={() => <Text>{emptyMessage}</Text>}
           renderItem={({item}) => 
             <ItemCard 
               title={item.original_title}
